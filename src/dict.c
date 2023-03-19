@@ -522,7 +522,7 @@ int dictAdd(dict *d, void *key, void *val)
  *
  * 如果键已经在字典存在，那么返回 NULL
  *
- * 如果键不存在，那么程序创建新的哈希节点，
+ * 如果键不存在，那么程序创建新的哈希节点，dictEntry
  * 将节点和键关联，并插入到字典，然后返回节点本身。
  *
  * T = O(N)
@@ -1391,6 +1391,7 @@ unsigned long dictScan(dict *d,
 /* Expand the hash table if needed */
 /*
  * 根据需要，初始化字典（的哈希表），或者对字典（的现有哈希表）进行扩展
+ * 扩容、缩容
  *
  * T = O(N)
  */
@@ -1412,7 +1413,8 @@ static int _dictExpandIfNeeded(dict *d)
     // 一下两个条件之一为真时，对字典进行扩展
     // 1）字典已使用节点数和字典大小之间的比率接近 1：1
     //    并且 dict_can_resize 为真
-    // 2）已使用节点数和字典大小之间的比率超过 dict_force_resize_ratio
+    // 2）已使用节点数和字典大小之间的比率超过 dict_force_resize_ratio  ==> 已使用节点数是hash表大小得五倍多
+    // todo 很奇怪，注释写的是二者之一，可是这里代码写的是 并且
     if (d->ht[0].used >= d->ht[0].size &&
         (dict_can_resize ||
          d->ht[0].used/d->ht[0].size > dict_force_resize_ratio))
@@ -1476,6 +1478,7 @@ static int _dictKeyIndex(dict *d, const void *key)
     for (table = 0; table <= 1; table++) {
 
         // 计算索引值
+        // 这里其实就是取余操作，但是由于ht的大小是以2的倍数扩容的，那么对2的倍数取余是可以用一个数 & 上 （2的倍数 - 1） 这个数的
         idx = h & d->ht[table].sizemask;
 
         /* Search if this slot does not already contain the given key */

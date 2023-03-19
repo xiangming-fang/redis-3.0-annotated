@@ -27,7 +27,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
+// 算是搞明白为啥需要.h文件了，因为能帮你快速定位对应.c的方法
 #ifndef __SDS_H
 #define __SDS_H
 
@@ -87,6 +87,7 @@ sds sdsdup(const sds s);
 void sdsfree(sds s);
 size_t sdsavail(const sds s);
 sds sdsgrowzero(sds s, size_t len);
+
 sds sdscatlen(sds s, const void *t, size_t len);
 sds sdscat(sds s, const char *t);
 sds sdscatsds(sds s, const sds t);

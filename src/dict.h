@@ -111,13 +111,14 @@ typedef struct dictType {
  * 哈希表
  *
  * 每个字典都使用两个哈希表，从而实现渐进式 rehash 。
+ * 6
  */
 typedef struct dictht {
     
     // 哈希表数组
     dictEntry **table;
 
-    // 哈希表大小
+    // 哈希表大小，一维的长度
     unsigned long size;
     
     // 哈希表大小掩码，用于计算索引值
@@ -125,12 +126,13 @@ typedef struct dictht {
     unsigned long sizemask;
 
     // 该哈希表已有节点的数量
+    // ht二维链表的节点个数
     unsigned long used;
 
 } dictht;
 
 /*
- * 字典
+ * 字典结构，redis里的很多类型里的实现都是依赖字典的
  */
 typedef struct dict {
 
@@ -140,7 +142,9 @@ typedef struct dict {
     // 私有数据
     void *privdata;
 
-    // 哈希表
+    // 哈希表数组，有两个hash表
+    // 为什么需要两个？
+    // 因为再字典扩容、缩容的时候，是渐进式hash，需要一个新的hash表存储值，而且在扩容期间是查询两个hash表的，完成扩容、缩容再用一个
     dictht ht[2];
 
     // rehash 索引
@@ -244,9 +248,9 @@ typedef void (dictScanFunction)(void *privdata, const dictEntry *de);
 #define dictGetSignedIntegerVal(he) ((he)->v.s64)
 // 返回给定节点的无符号整数值
 #define dictGetUnsignedIntegerVal(he) ((he)->v.u64)
-// 返回给定字典的大小
+// 返回给定字典的大小，两个ht的都算上
 #define dictSlots(d) ((d)->ht[0].size+(d)->ht[1].size)
-// 返回字典的已有节点数量
+// 返回字典的已有节点数量，两个ht的都算上
 #define dictSize(d) ((d)->ht[0].used+(d)->ht[1].used)
 // 查看字典是否正在 rehash
 #define dictIsRehashing(ht) ((ht)->rehashidx != -1)

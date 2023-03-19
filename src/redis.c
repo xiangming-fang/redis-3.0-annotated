@@ -697,6 +697,7 @@ dictType replScriptCacheDictType = {
     NULL                        /* val destructor */
 };
 
+// ht 的缩容条件，ht 的 slot 大于 4，但是 使用率（used/slot-size) 不足 10%
 int htNeedsResize(dict *dict) {
     long long size, used;
 

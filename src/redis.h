@@ -395,9 +395,12 @@ typedef long long mstime_t; /* millisecond time type. */
 /*
  * Redis 对象
  */
+// 这个对象最后一次被访问的时间用24个bit存储
 #define REDIS_LRU_BITS 24
 #define REDIS_LRU_CLOCK_MAX ((1<<REDIS_LRU_BITS)-1) /* Max value of obj->lru */
 #define REDIS_LRU_CLOCK_RESOLUTION 1000 /* LRU clock resolution in ms */
+
+// 所有redis对象的头结构
 typedef struct redisObject {
 
     // 类型
@@ -409,7 +412,7 @@ typedef struct redisObject {
     // 对象最后一次被访问的时间
     unsigned lru:REDIS_LRU_BITS; /* lru time (relative to server.lruclock) */
 
-    // 引用计数
+    // 引用计数，为0的时候会销毁对象
     int refcount;
 
     // 指向实际值的指针
@@ -450,6 +453,7 @@ struct evictionPoolEntry {
 /* Redis database representation. There are multiple databases identified
  * by integers from 0 (the default database) up to the max configured
  * database. The database number is the 'id' field in the structure. */
+// 牛逼了，这是redis里面库的表现，默认第0个库
 typedef struct redisDb {
 
     // 数据库键空间，保存着数据库中的所有键值对
